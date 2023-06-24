@@ -1,0 +1,105 @@
+create database project
+use project
+ 
+create table shopping_history (
+
+product varchar(20) not null,
+
+quantity int not null,
+
+unit_price int not null);
+
+Insert into shopping_history values
+('Milk',3,26),
+('Bread',5,13),
+('Honey',2,47),
+('Biscuit',4,15),
+('Bun',12,6),
+('Biscuit',5,10),
+('Sauce',2,69),
+('Honey',3,52),
+('Sauce',5,37),
+('Honey',1,102);
+
+select * from shopping_history
+
+select product,sum((quantity*unit_price)) as total_price from shopping_history
+group by product
+order by product
+------------------------------------------------------------------------------------
+create table phones (
+name varchar(20) not null unique,
+phone_number integer not null unique);
+
+Insert into phones values
+('John',6536),
+('Adison',4589),
+('Blake',2378),
+('Johnny',1489),
+('Phil',2267),
+('Claire',9956),
+('Lucas',8879),
+('Brad',1184),
+('Luke',6374),
+('Angle',9442);
+
+create table calls (
+id integer not null,
+caller integer not null,
+callee integer not null,
+duration integer not null,
+unique(id)
+);
+
+Insert into calls values
+(1,6536,6374,5),
+(2,1184,2267,8),
+(3,9442,6375,3),
+(14,1489,5656,25),
+(15,1234,2378,9),
+(16,6536,4589,1),
+(23,1184,2000,10),
+(56,8879,1184,2),
+(17,2378,4545,6),
+(5,6536,6374,5);
+
+select p.name
+from phones p
+where p.phone_number in(select caller from calls
+group by caller,callee
+having sum(duration)>=10
+union 
+select callee from calls
+group by caller,callee
+having sum(duration)>=10 )
+order by p.name
+-------------------------------------------------------------------------------------------------
+CREATE TABLE transactions(
+Amount INTEGER NOT NULL,
+Date DATE NOT NULL);
+
+INSERT INTO transactions (Amount,Date) VALUES (1000, '2020-01-06');
+INSERT INTO transactions (Amount,Date) VALUES (-10,'2020-01-14');
+INSERT INTO transactions (Amount,Date) VALUES (-75,'2020-01-20');
+INSERT INTO transactions (Amount,Date) VALUES (-5,'2020-01-25');
+INSERT INTO transactions (Amount,Date) VALUES (-4,'2020-01-29');
+INSERT INTO transactions (Amount,Date) VALUES (2000, '2020-03-10');
+INSERT INTO transactions (Amount,Date) VALUES (-75,'2020-03-12');
+INSERT INTO transactions (Amount,Date) VALUES (-20,'2020-03-15');
+INSERT INTO transactions (Amount,Date) VALUES (40,'2020-03-15');
+INSERT INTO transactions (Amount,Date) VALUES (-50,'2020-03-17');
+INSERT INTO transactions (Amount,Date) VALUES (200, '2020-10-10');
+INSERT INTO transactions (Amount,Date) VALUES (-200,'2020-10-10');
+
+with mont_bal as (
+    select count(distinct month(date)) as mon from transactions
+    where amount<0 
+    group by month(date)
+    having count(date)=3 and sum(amount)<-100
+)
+select distinct
+(select sum(amount)from transactions) - (select sum(((12*5)-((select mon from mont_bal)*5))))
+from mont_bal ,transactions 
+on m.date=t.date
+--------------------------------------------------------------------------------------------------------------------------------
+
